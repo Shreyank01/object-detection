@@ -1,6 +1,9 @@
 function setup() {
-    canvas = createCanvas(600,400);
+    canvas = createCanvas(400,400);
     canvas.center();
+    video = createCapture(VIDEO);
+    video.hide();
+    video.size(400,400);
     object_detector = ml5.objectDetector('cocossd' , modelLoaded);
     document.getElementById("status").innerHTML = "Object : Detecting...";
 }
@@ -8,7 +11,7 @@ function setup() {
 function modelLoaded() {
     console.log("Model Loaded !");
     status = true;
-    object_detector.detect(img , gotResult);
+    
 }
 
 function gotResult(error , results) {
@@ -21,29 +24,30 @@ function gotResult(error , results) {
     }
 }
 
-img = "";
 status = "";
 objects = [];
 
 function preload() {
-    img = loadImage("dog_cat.jpg")
 }
 
 function draw() {
-    image(img ,0 ,0 ,600 ,400); 
+    image(video ,0 ,0 ,400 ,400); 
     if(status != "") {
+        object_detector.detect(video , gotResult);
         for(i=0; i < objects.length; i++) {
             document.getElementById("status").innerHTML = "Object : Detected";
-
+            r = random(255);
+            g = random(255);
+            b = random(255);
+            a = random(100,255);
             percent = Math.floor(objects[i].confidence * 100);
-            fill("red");
+            fill(r,g,b,a);
             text(objects[i].label + " " + percent + "%" , objects[i].x , objects[i].y);
             noFill();
-            stroke("red");
+            stroke(r,g,b,a);
             rect(objects[i].x , objects[i].y, objects[i].width, objects[i].height);
-
-            document.getElementById("Detected_objects").innerHTML = "Detected objects : " + objects[0].label + "," + objects[1].label+ ","+ objects[2].label;
-        }
+             document.getElementById("Detected_objects").innerHTML = "Number of objects detected are : " + objects.length; 
+                }
     }
 
 }
